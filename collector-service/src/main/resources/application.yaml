@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: collector-service
+  data:
+    mongodb:
+      logs:
+        uri: mongodb://localhost:27017
+        database: monitoring_logs
+      metadata:
+        uri: mongodb://localhost:27018
+        database: monitoring_metadata
+
+jwt:
+  secret: mySecretKeyForJWTTokenGenerationThatIsAtLeast256BitsLongForHS256Algorithm
+  expiration: 86400000
+
+logging:
+  level:
+    com.monitoring: DEBUG
+    org.springframework.data.mongodb: DEBUG

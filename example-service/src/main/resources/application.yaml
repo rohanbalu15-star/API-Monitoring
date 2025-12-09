@@ -1,0 +1,12 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: example-service
+
+monitoring:
+  collectorUrl: http://localhost:8080/api/logs
+  rateLimit:
+    service: example-service
+    limit: 100

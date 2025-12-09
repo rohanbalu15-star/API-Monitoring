@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mongodb-logs:
+    image: mongo:7.0
+    container_name: mongodb-logs
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_logs_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=monitoring_logs
+
+  mongodb-metadata:
+    image: mongo:7.0
+    container_name: mongodb-metadata
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_metadata_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=monitoring_metadata
+
+volumes:
+  mongodb_logs_data:
+  mongodb_metadata_data:
