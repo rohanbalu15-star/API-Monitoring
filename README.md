@@ -2,6 +2,8 @@
 
 A production-ready, comprehensive platform for tracking API requests across multiple microservices, analyzing performance metrics, and managing incidents. Built with Spring Boot (Kotlin), Next.js, and MongoDB.
 
+> **⚠️ IMPORTANT:** This project requires **Java 25.0.1** and **Gradle 9.1+**. See [VERSION_INFO.md](VERSION_INFO.md) for details.
+
 ## Architecture Overview
 
 The platform consists of three main components:

@@ -2,6 +2,36 @@
 
 This comprehensive guide will walk you through everything from cloning the repository to using the dashboard. Designed specifically for Windows users.
 
+> **IMPORTANT:** This project requires **Java 25.0.1** and **Gradle 9.1+**. Java 17 or lower versions will NOT work. Make sure you download and install the correct versions as specified in this guide.
+
+## Quick Start (If you already have Java 25 & Gradle 9.1+)
+
+Already have the right versions? Jump straight to running the application:
+
+```powershell
+# 1. Start MongoDB
+docker-compose up -d
+
+# 2. Start Backend (in new terminal)
+cd collector-service
+gradle bootRun
+
+# 3. Start Frontend (in new terminal)
+cd dashboard
+npm install
+npm run dev
+
+# 4. Create user (in new terminal)
+$body = @{username="admin";password="admin123";email="admin@example.com"} | ConvertTo-Json
+Invoke-RestMethod -Uri "http://localhost:8080/api/auth/register" -Method POST -ContentType "application/json" -Body $body
+
+# 5. Open browser: http://localhost:3000
+```
+
+**First time setup?** Continue reading below.
+
+---
+
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
 2. [Cloning the Repository](#cloning-the-repository)
@@ -22,6 +52,19 @@ Before starting, ensure you have:
 - Internet connection
 - At least 4GB of free RAM
 - 5GB of free disk space
+
+### Required Software Versions
+
+This project has been configured for and tested with:
+
+| Software | Version | Required? | Notes |
+|----------|---------|-----------|-------|
+| **Java** | 25.0.1 | ✅ Yes | Must be exactly 25.x (Java 17 will NOT work) |
+| **Gradle** | 9.1.0+ | ✅ Yes | Minimum 8.10 for Java 25 support |
+| **Node.js** | 18.x+ | ✅ Yes | For dashboard frontend |
+| **Docker Desktop** | Latest | ✅ Yes | For MongoDB containers |
+| **Kotlin** | 1.9.22 | ✅ Yes | Bundled with project |
+| **Spring Boot** | 3.2.2 | ✅ Yes | Bundled with project |
 
 ## Cloning the Repository
 
@@ -62,11 +105,11 @@ If you downloaded the project as a ZIP file instead:
 
 You'll need to install 4 pieces of software. Let's go through each one step by step.
 
-### 1. Install Java 17 (Required for Backend)
+### 1. Install Java 25 (Required for Backend)
 
 **Step 1:** Download Java
 - Visit: https://adoptium.net/
-- Click "Download" for the latest Java 17 (LTS)
+- Click "Download" for Java 25 (Latest)
 - Choose "Windows x64" installer (.msi file)
 
 **Step 2:** Install Java
@@ -79,14 +122,14 @@ You'll need to install 4 pieces of software. Let's go through each one step by s
 java -version
 ```
 
-You should see something like: `openjdk version "17.0.x"`
+You should see something like: `openjdk version "25.0.1"`
 
 **Step 4:** Set JAVA_HOME (Important!)
 1. Press `Win + R`, type `sysdm.cpl`, press Enter
 2. Go to "Advanced" tab → Click "Environment Variables"
 3. Under "System variables", click "New"
 4. Variable name: `JAVA_HOME`
-5. Variable value: `C:\Program Files\Eclipse Adoptium\jdk-17.x.x-hotspot` (your actual path)
+5. Variable value: `C:\Program Files\Eclipse Adoptium\jdk-25.0.1+8-hotspot` (your actual path)
 6. Click OK on all windows
 7. **Restart PowerShell** for changes to take effect
 
@@ -138,7 +181,7 @@ docker ps
 
 You should see version info and an empty container list.
 
-### 4. Install Gradle (Required for Building Backend)
+### 4. Install Gradle 9.1+ (Required for Building Backend with Java 25)
 
 **Option A: Using Chocolatey (Recommended)**
 
@@ -156,18 +199,22 @@ choco install gradle
 
 **Option B: Manual Installation**
 
-1. Download from: https://gradle.org/install/
+1. Download Gradle 9.1 or higher from: https://gradle.org/releases/
 2. Extract to `C:\Gradle`
 3. Add to PATH:
    - System Properties → Environment Variables
    - Edit "Path" in System variables
-   - Add: `C:\Gradle\gradle-8.5\bin`
+   - Add: `C:\Gradle\gradle-9.1\bin`
 4. Restart PowerShell
 
 **Verify Installation:**
 ```powershell
 gradle -v
 ```
+
+You should see Gradle version 9.1.0 or higher
+
+**Important:** Java 25 requires Gradle 8.10 or higher. The project is configured for Gradle 8.11+.
 
 ---
 
@@ -511,13 +558,15 @@ curl.exe http://localhost:8081/api/reports
    ```
 2. Set JAVA_HOME temporarily:
    ```powershell
-   $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.x-hotspot"
+   $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-25.0.1+8-hotspot"
    ```
 3. Set permanently:
    - System Properties → Environment Variables
    - Add System Variable: `JAVA_HOME`
    - Value: Path to your Java installation (not the bin folder)
 4. Restart PowerShell
+
+**Note:** Make sure you have Java 25 installed. Java 17 will NOT work with this project.
 
 ### Error: "Docker daemon is not running"
 
@@ -592,6 +641,39 @@ npm install
 1. Try registering again with a different username
 2. Check collector service console for error messages
 3. Verify MongoDB is running
+
+### Error: "Unsupported class file major version" or Java version mismatch
+
+**Problem:** You're using an incompatible Java version.
+
+**Solution:**
+1. Verify Java version:
+   ```powershell
+   java -version
+   ```
+2. Must show version 25.0.1 or higher
+3. If not, uninstall old Java and install Java 25 from https://adoptium.net/
+4. Update JAVA_HOME environment variable
+5. Restart PowerShell and try again
+
+### Error: "Gradle wrapper not found" or "GradleWrapperMain not found"
+
+**Problem:** Gradle wrapper JAR file is missing.
+
+**Solution:**
+Since you have Gradle 9.1 installed, just use `gradle` directly instead of `gradlew`:
+
+```powershell
+# Instead of .\gradlew bootRun
+# Use:
+gradle bootRun
+```
+
+Or regenerate the wrapper:
+```powershell
+cd collector-service
+gradle wrapper --gradle-version 8.11
+```
 
 ---
 
@@ -715,6 +797,7 @@ Read the [README.md](README.md) for:
 - **Main Documentation:** [README.md](README.md)
 - **Architecture Details:** [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Project Summary:** [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)
+- **Version Requirements:** [VERSION_INFO.md](VERSION_INFO.md) - Detailed version compatibility information
 
 ---
 
